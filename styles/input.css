@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    scroll-padding-top: 60px;
+    scroll-behavior: smooth;
+
+    --bg-primary: #2d2d2f;
+    --bg-secondary: #ffc814;
+    --bg-secondary2: #cb282d;
+    --bg-secondary3: #fbf5e7;
+
+    --bg-navbar-mobile: #1b1b1d;
+
+    --bg-success: #e6f6e9;
+    --text-success: #2e7d32;
+    --border-success: #81c784;
+
+    --bg-warning: #fff4e5;
+    --text-warning: #b76e00;
+    --border-warning: #ffcc80;
+
+    --bg-danger: #fdecec;
+    --text-danger: #c62828;
+    --border-danger: #ef9a9a;
+
+    --bg-info: #e7f3fe;
+    --text-info: #1565c0;
+    --border-info: #90caf9;
+
+    --txt-primary: #ffffff;
+    --txt-primary2: #2d2d2f;
+  }
+}
+
+#heroSection {
+  background: url(../assets/img/bg-hero.png) no-repeat center;
+  background-size: cover;
+}

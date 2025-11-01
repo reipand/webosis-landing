@@ -52,6 +52,28 @@ if ($urutkan_data == 'terbaru') {
     $sql .= " ORDER BY id DESC";
 }
 
+foreach ($data_row as $key => $value) {
+    echo '<td class="px-6 py-4">';
+    
+    // Logika FOTO PREVIEW
+    if (strpos($key, 'foto') !== false || strpos($key, 'file') !== false || strpos($key, 'upload') !== false) {
+        // Asumsi: path foto disimpan relatif, misalnya: uploads/nama_foto.jpg
+        $photo_path = '../../uploads/lomba/' . htmlspecialchars($value); 
+        
+        // Cek apakah itu file gambar yang valid
+        $extension = pathinfo($value, PATHINFO_EXTENSION);
+        if (!empty($value) && in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif'])) {
+            // Tampilkan foto preview kecil dan modal
+            echo '<img src="' . $photo_path . '" alt="' . htmlspecialchars($key) . '" class="w-16 h-16 object-cover rounded cursor-pointer" onclick="openImageModal(\'' . $photo_path . '\')">';
+        } else {
+            echo htmlspecialchars($value);
+        }
+    } else {
+        // Tampilkan data biasa
+        echo htmlspecialchars($value);
+    }
+    echo '</td>';
+}
 // DELETE DATA
 if (isset($_GET['kode'])) {
     $id = mysqli_real_escape_string($koneksi, $_GET['kode']);
@@ -499,8 +521,10 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                             </svg>
                             <span class="sr-only">Search</span>
                         </button>
+                        
                     </div>
                 </form>
+                
                 <div class="flex flex-col items-end justify-center">
                     <a href="../crud/tambah-input-lomba.php"
                         class="focus:outline-none text-[var(--txt-primary)] bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-2xl text-md px-5 py-2.5 shadow-lg hover:shadow-none transition duration-300 cursor-pointer">
@@ -508,6 +532,31 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                     </a>
                 </div>
             </div>
+            <div class="flex flex-wrap gap-4 mb-4">
+                
+    <!-- Tombol Export ke Excel dan PDF -->
+    <!-- <?php
+        // Ambil semua parameter GET saat ini untuk diteruskan ke file export
+        // $current_filters = http_build_query($_GET);
+    ?>
+    <a href="export_excel.php?<?php echo $current_filters; ?>" class="flex items-center text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 rounded-xl px-4 py-2 transition duration-300">
+        <svg class="w-4 h-4 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 10.158v1.895a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v1.895ZM14 13h1a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-1v7Z" />
+            <path d="M19 10a1 1 0 0 0-1-1h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Z" />
+            <path d="M19 12a1 1 0 0 0-1-1h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Z" />
+            <path d="M19 8a1 1 0 0 0-1-1h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Z" />
+        </svg>
+        Export ke Excel
+    </a>
+    <a href="export_pdf.php?<?php echo $current_filters; ?>" class="flex items-center text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 rounded-xl px-4 py-2 transition duration-300">
+        <svg class="w-4 h-4 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.414A2 2 0 0 0 16.414 6L13 2.586A2 2 0 0 0 11.586 2H5Zm6.414 0L15 6.586V12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4.414Z" />
+        </svg>
+        Export ke PDF
+    </a>
+</div> -->
+
+<div class="grid grid-cols-1 md:grid-cols-[4fr_1fr] gap-6 sm:gap-10 rounded-2xl"></div>
             <div class="flex items-center justify-center mt-4">
                 <div
                     class="relative overflow-x-auto rounded-xl sm:rounded-2xl border border-[var(--bg-primary)]/30 w-full">
@@ -564,6 +613,19 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                 </div>
             </div>
         </div>
+        <div id="imageModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full">
+    <div class="relative p-4 w-full max-w-3xl h-full md:h-auto">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="imageModal">
+                <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                <span class="sr-only">Close modal</span>
+            </button>
+            <div class="p-6 text-center">
+                <img id="modalImage" src="" alt="Preview Foto" class="max-w-full h-auto mx-auto rounded">
+            </div>
+        </div>
+    </div>
+</div>
     </div>
 
     <!-- Tutup Main Content Dashboard -->
@@ -596,6 +658,16 @@ $username = isset($_SESSION['username']) ? htmlspecialchars($_SESSION['username'
                 });
             });
         });
+
+        // Inisialisasi modal dari Flowbite
+    const imageModalEl = document.getElementById('imageModal');
+    const imageModal = new Modal(imageModalEl);
+    const modalImage = document.getElementById('modalImage');
+
+    function openImageModal(src) {
+        modalImage.src = src;
+        imageModal.show();
+    }
     </script>
 
 
